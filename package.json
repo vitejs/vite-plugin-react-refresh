@@ -18,6 +18,14 @@
   ],
   "author": "Evan You",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitejs/vite-plugin-react.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vitejs/vite-plugin-react/issues"
+  },
+  "homepage": "https://github.com/vitejs/vite-plugin-react/tree/master/#readme",
   "dependencies": {
     "@babel/core": "^7.9.6",
     "react-refresh": "^0.8.2"
