@@ -12,14 +12,26 @@ window.$RefreshSig$ = () => (type) => type
 </script>
 `
 
+function debounce(fn: () => void, delay: number) {
+  let handle: any
+  return () => {
+    clearTimeout(handle)
+    handle = setTimeout(fn, delay)
+  }
+}
+
 export const reactRefreshServerPlugin: ServerPlugin = ({ app }) => {
   const runtimePath = require.resolve(
     'react-refresh/cjs/react-refresh-runtime.development.js'
   )
-  const runtimeCode =
-    `const exports = {}\n` +
-    fs.readFileSync(runtimePath, 'utf-8') +
-    `\nexport default exports`
+  // shim the refresh runtime into an ES module
+  const runtimeCode = `
+const exports = {}
+${fs.readFileSync(runtimePath, 'utf-8')}
+${debounce.toString()}
+exports.performReactRefresh = debounce(exports.performReactRefresh, 16)
+export default exports
+`
 
   app.use(async (ctx, next) => {
     // serve react refresh runtime
