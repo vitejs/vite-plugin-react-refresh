@@ -45,8 +45,8 @@ export default exports
     await next()
 
     if ((ctx.path.endsWith('/') || ctx.path.endsWith('.html')) && ctx.body) {
-      // inject global preamble
-      ctx.body = globalPreamble + ctx.body
+      // inject react-refresh global preamble after the vite built-in preamble
+      ctx.body = ctx.body.replace('</script>', `</script>${globalPreamble}`)
     }
   })
 }
