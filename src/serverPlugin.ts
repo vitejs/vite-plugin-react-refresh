@@ -27,7 +27,7 @@ export const reactRefreshServerPlugin: ServerPlugin = ({ app }) => {
   // shim the refresh runtime into an ES module
   const runtimeCode = `
 const exports = {}
-${fs.readFileSync(runtimePath, 'utf-8')}
+${fs.readFileSync(runtimePath, 'utf-8').replace("process.env.NODE_ENV", JSON.stringify("development"))}
 ${debounce.toString()}
 exports.performReactRefresh = debounce(exports.performReactRefresh, 16)
 export default exports
