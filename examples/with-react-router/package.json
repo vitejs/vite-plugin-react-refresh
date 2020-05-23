@@ -1,0 +1,20 @@
+{
+  "name": "with-react-router",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "vite build src --outDir dist "
+  },
+  "dependencies": {
+    "@pika/react": "^16.13.1",
+    "@pika/react-dom": "^16.13.1",
+    "react-router": "^6.0.0-alpha.5",
+    "react-router-dom": "^6.0.0-alpha.5"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.35",
+    "@types/react-dom": "^16.9.8",
+    "vite": "^0.16.6",
+    "vite-plugin-react": "^1.0.0"
+  }
+}
