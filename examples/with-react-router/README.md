@@ -13,3 +13,7 @@ By default, Vite doesn't accept route like `/projects` (it will return 404), so 
 Actually it will run `node server.js` instead of `vite serve src`
 
 Everything should work normally
+
+## Demo
+
+https://vite-react-router.now.sh
