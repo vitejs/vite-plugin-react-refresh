@@ -12,14 +12,15 @@ export const reactRefreshTransform: Transform = {
       // do not transform for production builds
       return code
     }
-    return transformUtil(code, path)
+    return transformReactCode(code, path)
   }
 }
 
 /**
+ * Transform React code to inject hmr ability.
  * Help tools that generate react code (.e.g mdx) to support hmr.
  */
-export const transformUtil = (code: string, path: string) => {
+export const transformReactCode = (code: string, path: string) => {
   const result = require('@babel/core').transformSync(code, {
     plugins: [require('react-refresh/babel')]
   })
