@@ -12,17 +12,25 @@ export const reactRefreshTransform: Transform = {
       // do not transform for production builds
       return code
     }
+    return transformReactCode(code, path)
+  }
+}
 
-    const result = require('@babel/core').transformSync(code, {
-      plugins: [require('react-refresh/babel')]
-    })
+/**
+ * Transform React code to inject hmr ability.
+ * Help tools that generate react code (.e.g mdx) to support hmr.
+ */
+export const transformReactCode = (code: string, path: string) => {
+  const result = require('@babel/core').transformSync(code, {
+    plugins: [require('react-refresh/babel')]
+  })
 
-    if (!/\$RefreshReg\$\(/.test(result.code)) {
-      // no component detected in the file
-      return code
-    }
+  if (!/\$RefreshReg\$\(/.test(result.code)) {
+    // no component detected in the file
+    return code
+  }
 
-    return `
+  return `
 import RefreshRuntime from "${runtimePublicPath}"
 import { hot } from "vite/hmr"
 
@@ -30,23 +38,22 @@ let prevRefreshReg
 let prevRefreshSig
 
 if (__DEV__) {
-  prevRefreshReg = window.$RefreshReg$
-  prevRefreshSig = window.$RefreshSig$
-  window.$RefreshReg$ = (type, id) => {
-    RefreshRuntime.register(type, ${JSON.stringify(path)} + " " + id)
-  }
-  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform
+prevRefreshReg = window.$RefreshReg$
+prevRefreshSig = window.$RefreshSig$
+window.$RefreshReg$ = (type, id) => {
+  RefreshRuntime.register(type, ${JSON.stringify(path)} + " " + id)
+}
+window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform
 }
 
 ${result.code}
 
 if (__DEV__) {
-  window.$RefreshReg$ = prevRefreshReg
-  window.$RefreshSig$ = prevRefreshSig
+window.$RefreshReg$ = prevRefreshReg
+window.$RefreshSig$ = prevRefreshSig
 
-  hot.accept()
-  RefreshRuntime.performReactRefresh()
+hot.accept()
+RefreshRuntime.performReactRefresh()
 }
 `
-  }
 }
