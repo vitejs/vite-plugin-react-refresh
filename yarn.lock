@@ -311,6 +311,11 @@
     "@types/koa-compose" "*"
     "@types/node" "*"
 
+"@types/lru-cache@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@types/lru-cache/-/lru-cache-5.1.0.tgz#57f228f2b80c046b4a1bd5cac031f81f207f4f03"
+  integrity sha512-RaE0B+14ToE4l6UqdarKPnXwVDuigfFv+5j9Dze/Nqr23yyuqdNvzcZi3xB+3Agvi5R4EOgAksfv3lXX4vBt9w==
+
 "@types/mime@*":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-2.0.2.tgz#857a118d8634c84bba7ae14088e4508490cd5da5"
@@ -1017,6 +1022,11 @@ dot-prop@^5.2.0:
   dependencies:
     is-obj "^2.0.0"
 
+dotenv@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
+  integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
+
 duplexer@0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/duplexer/-/duplexer-0.1.1.tgz#ace6ff808c1ce66b57d1ebf97977acb02334cfc1"
@@ -1092,10 +1102,10 @@ es-to-primitive@^1.2.1:
     is-date-object "^1.0.1"
     is-symbol "^1.0.2"
 
-esbuild@^0.3.2:
-  version "0.3.5"
-  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.3.5.tgz#1e14911862d8b2bf6b0993e743071897186131fb"
-  integrity sha512-EJNiTWGdhppolWRhfTrqbK2PMVVcMGqBCGSbiW2jRvhDv9s4MqSMm/18d8L1q0IFyxPaTg/I0MRlSik9nLttrA==
+esbuild@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.4.1.tgz#c746146278b8f71d9de473304ed89f5a9deccdea"
+  integrity sha512-84KjyYa1hgrHe01Qrsbf+anzcWWf6EA51TtRzZwLtphNd/Zf+V/fBT0jd3I+F+p+gB7+MFAS9pw4pxXOWPhHkA==
 
 escape-html@^1.0.3:
   version "1.0.3"
@@ -1839,6 +1849,11 @@ negotiator@0.6.2:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.2.tgz#feacf7ccf525a77ae9634436a64883ffeca346fb"
   integrity sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==
 
+node-forge@0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.9.0.tgz#d624050edbb44874adca12bb9a52ec63cb782579"
+  integrity sha512-7ASaDa3pD+lJ3WvXFsxekJQelBKRpne+GOVbLbtHYdd7pFspyeuJHnWfLplGf3SwKGbfs/aYl5V/JCIaHVUKKQ==
+
 node-releases@^1.1.53:
   version "1.1.55"
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.55.tgz#8af23b7c561d8e2e6e36a46637bab84633b07cee"
@@ -2469,7 +2484,7 @@ resolve-path@^1.4.0:
     http-errors "~1.6.2"
     path-is-absolute "1.0.1"
 
-resolve@^1.11.0, resolve@^1.14.2, resolve@^1.3.2:
+resolve@^1.11.0, resolve@^1.14.2, resolve@^1.17.0, resolve@^1.3.2:
   version "1.17.0"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.17.0.tgz#b25941b54968231cc2d1bb76a79cb7f2c0bf8444"
   integrity sha512-ic+7JYiV8Vi2yzQGFWOkiZD5Z9z7O2Zhm9XMaTxdJExKasieFCr+yXZ/WmXsckHiKl12ar0y6XiXDx3m4RHn1w==
@@ -2537,6 +2552,13 @@ sax@~1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
+
+selfsigned@^1.10.7:
+  version "1.10.7"
+  resolved "https://registry.yarnpkg.com/selfsigned/-/selfsigned-1.10.7.tgz#da5819fd049d5574f28e88a9bcc6dbc6e6f3906b"
+  integrity sha512-8M3wBCzeWIJnQfl43IKwOmC4H/RAp50S8DF60znzjW5GVqTcSe2vWclt7hmYVPkKPlHWOu5EaWOMZ2Y6W8ZXTA==
+  dependencies:
+    node-forge "0.9.0"
 
 semver@^5.4.1:
   version "5.7.1"
@@ -2870,16 +2892,17 @@ vendors@^1.0.0:
   resolved "https://registry.yarnpkg.com/vendors/-/vendors-1.0.4.tgz#e2b800a53e7a29b93506c3cf41100d16c4c4ad8e"
   integrity sha512-/juG65kTL4Cy2su4P8HjtkTxk6VmJDiOPBufWniqQ6wknac6jNiXS9vU+hO3wgusiyqWlzTbVHi0dyJqRONg3w==
 
-vite@^0.16.0:
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-0.16.0.tgz#c27317b66c44685d4cd19c2dd81d7953ac5cad04"
-  integrity sha512-JBgdl2qwfcgGciBYo/duMqjuQEFaH/Fwx5rGeEMIz/DxsaHEjscK8xigYfzvZ+UVnoC+VtmnnTGW5RiP3SCkLg==
+vite@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-0.17.0.tgz#d6a98826ca408839bebbcd5c5154bebc3de13c33"
+  integrity sha512-BeqKnbybD1vq6oND8TTYPzG4AAfM1iYOVqsrS7fzHsRjAk0tfV/856EhpGL09dfkLv8yKNjCr7CxG//8K9vFuA==
   dependencies:
     "@babel/parser" "^7.9.4"
     "@rollup/plugin-commonjs" "~11.0.0"
     "@rollup/plugin-json" "^4.0.3"
     "@rollup/plugin-node-resolve" "^7.1.3"
     "@types/koa" "^2.11.3"
+    "@types/lru-cache" "^5.1.0"
     "@vue/compiler-dom" "^3.0.0-beta.14"
     "@vue/compiler-sfc" "^3.0.0-beta.14"
     brotli-size "^4.0.0"
@@ -2887,8 +2910,9 @@ vite@^0.16.0:
     chokidar "^3.3.1"
     cssnano "^4.1.10"
     debug "^4.1.1"
+    dotenv "^8.2.0"
     es-module-lexer "^0.3.18"
-    esbuild "^0.3.2"
+    esbuild "^0.4.1"
     etag "^1.8.1"
     execa "^4.0.1"
     fs-extra "^9.0.0"
@@ -2908,9 +2932,11 @@ vite@^0.16.0:
     postcss "^7.0.28"
     postcss-load-config "^2.1.0"
     postcss-modules "^2.0.0"
+    resolve "^1.17.0"
     rollup "^2.7.2"
     rollup-plugin-terser "^5.3.0"
     rollup-plugin-vue "^6.0.0-beta.1"
+    selfsigned "^1.10.7"
     slash "^3.0.0"
     vue "^3.0.0-beta.14"
     ws "^7.2.3"

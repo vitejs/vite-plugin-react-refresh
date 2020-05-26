@@ -45,16 +45,8 @@ export default exports
     await next()
 
     if ((ctx.path.endsWith('/') || ctx.path.endsWith('.html')) && ctx.body) {
-      if (typeof ctx.body === 'string') {
-        // if the built-in preamble is already injected (pre vite 0.17),
-        // inject react-refresh global preamble after the vite built-in preamble
-        ctx.body = ctx.body.replace('</script>', '</script>' + globalPreamble)
-      } else {
-        // Post 0.17 this will be called before the html rewrite from Vite.
-        // Just inject before the html, but the html will be strings.
-        const html = (await readBody(ctx.body))!
-        ctx.body = globalPreamble + html
-      }
+      const html = (await readBody(ctx.body))!
+      ctx.body = globalPreamble + html
     }
   })
 }

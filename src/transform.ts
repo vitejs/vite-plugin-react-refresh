@@ -32,28 +32,27 @@ export const transformReactCode = (code: string, path: string) => {
 
   return `
 import RefreshRuntime from "${runtimePublicPath}"
-import { hot } from "vite/hmr"
 
 let prevRefreshReg
 let prevRefreshSig
 
-if (__DEV__) {
-prevRefreshReg = window.$RefreshReg$
-prevRefreshSig = window.$RefreshSig$
-window.$RefreshReg$ = (type, id) => {
-  RefreshRuntime.register(type, ${JSON.stringify(path)} + " " + id)
-}
-window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform
+if (import.meta.hot) {
+  prevRefreshReg = window.$RefreshReg$
+  prevRefreshSig = window.$RefreshSig$
+  window.$RefreshReg$ = (type, id) => {
+    RefreshRuntime.register(type, ${JSON.stringify(path)} + " " + id)
+  }
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform
 }
 
 ${result.code}
 
-if (__DEV__) {
-window.$RefreshReg$ = prevRefreshReg
-window.$RefreshSig$ = prevRefreshSig
+if (import.meta.hot) {
+  window.$RefreshReg$ = prevRefreshReg
+  window.$RefreshSig$ = prevRefreshSig
 
-hot.accept()
-RefreshRuntime.performReactRefresh()
+  import.meta.hot.accept()
+  RefreshRuntime.performReactRefresh()
 }
 `
 }
