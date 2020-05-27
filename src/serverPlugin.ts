@@ -9,6 +9,7 @@ import RefreshRuntime from "${runtimePublicPath}"
 RefreshRuntime.injectIntoGlobalHook(window)
 window.$RefreshReg$ = () => {}
 window.$RefreshSig$ = () => (type) => type
+window.__vite_plugin_react_preamble_installed__ = true
 </script>
 `
 
@@ -44,7 +45,7 @@ export default exports
 
     await next()
 
-    if ((ctx.path.endsWith('/') || ctx.path.endsWith('.html')) && ctx.body) {
+    if (ctx.response.is('html') && ctx.body) {
       const html = (await readBody(ctx.body))!
       ctx.body = globalPreamble + html
     }

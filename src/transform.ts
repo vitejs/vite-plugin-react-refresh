@@ -36,6 +36,12 @@ import RefreshRuntime from "${runtimePublicPath}"
 let prevRefreshReg
 let prevRefreshSig
 
+if (!window.__vite_plugin_react_preamble_installed__) {
+  throw new Error(
+    "vite-plugin-react can't detect preamble. Something is wrong. See https://github.com/vitejs/vite-plugin-react/pull/11#discussion_r430879201"
+  )
+}
+
 if (import.meta.hot) {
   prevRefreshReg = window.$RefreshReg$
   prevRefreshSig = window.$RefreshSig$
