@@ -44,7 +44,7 @@ export default exports
 
     await next()
 
-    if ((ctx.path.endsWith('/') || ctx.path.endsWith('.html')) && ctx.body) {
+    if (ctx.response && ctx.response.type === 'text/html' && ctx.body) {
       const html = (await readBody(ctx.body))!
       ctx.body = globalPreamble + html
     }
