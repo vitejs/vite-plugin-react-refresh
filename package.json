@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-react",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "React fast refresh plugin for Vite",
   "main": "dist/index.js",
   "files": [
