@@ -1,6 +1,10 @@
 import fs from 'fs'
 import { ServerPlugin, readBody } from 'vite'
 
+// this is only provided in vite >=0.20.2 so avoid breaking types by requiring
+// it
+const { injectScriptToHtml } = require('vite')
+
 export const runtimePublicPath = '/@react-refresh'
 
 const globalPreamble = `
@@ -47,7 +51,12 @@ export default exports
 
     if (ctx.response.is('html') && ctx.body) {
       const html = (await readBody(ctx.body))!
-      ctx.body = globalPreamble + html
+      if (injectScriptToHtml) {
+        ctx.body = injectScriptToHtml(html, globalPreamble)
+      } else {
+        // < 0.20.2
+        ctx.body = globalPreamble + html
+      }
     }
   })
 }
