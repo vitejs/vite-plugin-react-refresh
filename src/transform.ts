@@ -2,15 +2,10 @@ import { runtimePublicPath } from './serverPlugin'
 import { Transform } from 'vite'
 
 export const reactRefreshTransform: Transform = {
-  test: (path) => /\.(t|j)sx?$/.test(path),
-  transform: (code, _, isBuild, path) => {
+  test: ({ path }) => /\.(t|j)sx$/.test(path),
+  transform: ({ code, isBuild, path }) => {
     if (isBuild || process.env.NODE_ENV === 'production') {
       // do not transform for production builds
-      return code
-    }
-    if (path.startsWith(`/@modules/`) && path.endsWith('.js')) {
-      // for files imported as modules, only transform jsx/tsx
-      // to avoid the babel call on heavy dependencies.
       return code
     }
     return transformReactCode(code, path)
@@ -23,7 +18,10 @@ export const reactRefreshTransform: Transform = {
  */
 export const transformReactCode = (code: string, path: string) => {
   const result = require('@babel/core').transformSync(code, {
-    plugins: [require('react-refresh/babel')]
+    plugins: [require('react-refresh/babel')],
+    ast: false,
+    sourceMaps: true,
+    sourceFileName: path
   })
 
   if (!/\$RefreshReg\$\(/.test(result.code)) {
@@ -31,35 +29,38 @@ export const transformReactCode = (code: string, path: string) => {
     return code
   }
 
-  return `
-import RefreshRuntime from "${runtimePublicPath}"
+  const header = `
+import RefreshRuntime from "${runtimePublicPath}";
 
-let prevRefreshReg
-let prevRefreshSig
+let prevRefreshReg;
+let prevRefreshSig;
 
 if (!window.__vite_plugin_react_preamble_installed__) {
   throw new Error(
     "vite-plugin-react can't detect preamble. Something is wrong. See https://github.com/vitejs/vite-plugin-react/pull/11#discussion_r430879201"
-  )
+  );
 }
 
 if (import.meta.hot) {
-  prevRefreshReg = window.$RefreshReg$
-  prevRefreshSig = window.$RefreshSig$
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
   window.$RefreshReg$ = (type, id) => {
     RefreshRuntime.register(type, ${JSON.stringify(path)} + " " + id)
-  }
-  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform
-}
+  };
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}`.replace(/[\n]+/gm, '')
 
-${result.code}
-
+  const footer = `
 if (import.meta.hot) {
-  window.$RefreshReg$ = prevRefreshReg
-  window.$RefreshSig$ = prevRefreshSig
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
 
-  import.meta.hot.accept()
-  RefreshRuntime.performReactRefresh()
-}
-`
+  import.meta.hot.accept();
+  RefreshRuntime.performReactRefresh();
+}`
+
+  return {
+    code: `${header}${result.code}${footer}`,
+    map: result.map
+  }
 }
