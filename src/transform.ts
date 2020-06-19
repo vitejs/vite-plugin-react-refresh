@@ -4,12 +4,13 @@ import { Transform } from 'vite'
 export const reactRefreshTransform: Transform = {
   test: (path) => /\.(t|j)sx?$/.test(path),
   transform: (code, _, isBuild, path) => {
-    if (
-      isBuild ||
-      path.startsWith(`/@modules/`) ||
-      process.env.NODE_ENV === 'production'
-    ) {
+    if (isBuild || process.env.NODE_ENV === 'production') {
       // do not transform for production builds
+      return code
+    }
+    if (path.startsWith(`/@modules/`) && path.endsWith('.js')) {
+      // for files imported as modules, only transform jsx/tsx
+      // to avoid the babel call on heavy dependencies.
       return code
     }
     return transformReactCode(code, path)
