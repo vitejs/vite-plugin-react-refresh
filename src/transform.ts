@@ -2,65 +2,67 @@ import { runtimePublicPath } from './serverPlugin'
 import { Transform } from 'vite'
 
 export const reactRefreshTransform: Transform = {
-  test: ({ path }) => /\.(t|j)sx$/.test(path),
-  transform: ({ code, isBuild, path }) => {
+  test: ({ path, isBuild }) => {
+    if (!/\.(t|j)sx?$/.test(path)) {
+      return false
+    }
     if (isBuild || process.env.NODE_ENV === 'production') {
       // do not transform for production builds
+      return false
+    }
+    if (path.startsWith(`/@modules/`) && !path.endsWith('x')) {
+      // do not transform if this is a dep and is not jsx/tsx
+      return false
+    }
+    return true
+  },
+
+  transform: ({ code, path }) => {
+    const result = require('@babel/core').transformSync(code, {
+      plugins: [require('react-refresh/babel')],
+      ast: false,
+      sourceMaps: true,
+      sourceFileName: path
+    })
+
+    if (!/\$RefreshReg\$\(/.test(result.code)) {
+      // no component detected in the file
       return code
     }
-    return transformReactCode(code, path)
-  }
-}
 
-/**
- * Transform React code to inject hmr ability.
- * Help tools that generate react code (.e.g mdx) to support hmr.
- */
-export const transformReactCode = (code: string, path: string) => {
-  const result = require('@babel/core').transformSync(code, {
-    plugins: [require('react-refresh/babel')],
-    ast: false,
-    sourceMaps: true,
-    sourceFileName: path
-  })
+    const header = `
+  import RefreshRuntime from "${runtimePublicPath}";
 
-  if (!/\$RefreshReg\$\(/.test(result.code)) {
-    // no component detected in the file
-    return code
+  let prevRefreshReg;
+  let prevRefreshSig;
+
+  if (!window.__vite_plugin_react_preamble_installed__) {
+    throw new Error(
+      "vite-plugin-react can't detect preamble. Something is wrong. See https://github.com/vitejs/vite-plugin-react/pull/11#discussion_r430879201"
+    );
   }
 
-  const header = `
-import RefreshRuntime from "${runtimePublicPath}";
+  if (import.meta.hot) {
+    prevRefreshReg = window.$RefreshReg$;
+    prevRefreshSig = window.$RefreshSig$;
+    window.$RefreshReg$ = (type, id) => {
+      RefreshRuntime.register(type, ${JSON.stringify(path)} + " " + id)
+    };
+    window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+  }`.replace(/[\n]+/gm, '')
 
-let prevRefreshReg;
-let prevRefreshSig;
+    const footer = `
+  if (import.meta.hot) {
+    window.$RefreshReg$ = prevRefreshReg;
+    window.$RefreshSig$ = prevRefreshSig;
 
-if (!window.__vite_plugin_react_preamble_installed__) {
-  throw new Error(
-    "vite-plugin-react can't detect preamble. Something is wrong. See https://github.com/vitejs/vite-plugin-react/pull/11#discussion_r430879201"
-  );
-}
+    import.meta.hot.accept();
+    RefreshRuntime.performReactRefresh();
+  }`
 
-if (import.meta.hot) {
-  prevRefreshReg = window.$RefreshReg$;
-  prevRefreshSig = window.$RefreshSig$;
-  window.$RefreshReg$ = (type, id) => {
-    RefreshRuntime.register(type, ${JSON.stringify(path)} + " " + id)
-  };
-  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
-}`.replace(/[\n]+/gm, '')
-
-  const footer = `
-if (import.meta.hot) {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-
-  import.meta.hot.accept();
-  RefreshRuntime.performReactRefresh();
-}`
-
-  return {
-    code: `${header}${result.code}${footer}`,
-    map: result.map
+    return {
+      code: `${header}${result.code}${footer}`,
+      map: result.map
+    }
   }
 }
