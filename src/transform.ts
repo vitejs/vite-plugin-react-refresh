@@ -10,7 +10,7 @@ export const reactRefreshTransform: Transform = {
       // do not transform for production builds
       return false
     }
-    if (path.startsWith(`/@modules/`) && !path.endsWith('x')) {
+    if ((path.startsWith(`/@modules/`) || path.includes('node_modules')) && !path.endsWith('x')) {
       // do not transform if this is a dep and is not jsx/tsx
       return false
     }
