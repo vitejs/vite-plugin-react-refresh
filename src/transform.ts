@@ -1,36 +1,40 @@
 import { runtimePublicPath } from './serverPlugin'
 import { Transform } from 'vite'
 
-export const reactRefreshTransform: Transform = {
-  test: ({ path, isBuild }) => {
-    if (!/\.(t|j)sx?$/.test(path)) {
-      return false
-    }
-    if (isBuild || process.env.NODE_ENV === 'production') {
-      // do not transform for production builds
-      return false
-    }
-    if ((path.startsWith(`/@modules/`) || path.includes('node_modules')) && !path.endsWith('x')) {
-      // do not transform if this is a dep and is not jsx/tsx
-      return false
-    }
-    return true
-  },
+export const reactRefreshTransform = (babelPlugins: any[]): Transform => {
+  return {
+    test: ({ path, isBuild }) => {
+      if (!/\.(t|j)sx?$/.test(path)) {
+        return false
+      }
+      if (isBuild || process.env.NODE_ENV === 'production') {
+        // do not transform for production builds
+        return false
+      }
+      if (
+        (path.startsWith(`/@modules/`) || path.includes('node_modules')) &&
+        !path.endsWith('x')
+      ) {
+        // do not transform if this is a dep and is not jsx/tsx
+        return false
+      }
+      return true
+    },
 
-  transform: ({ code, path }) => {
-    const result = require('@babel/core').transformSync(code, {
-      plugins: [require('react-refresh/babel')],
-      ast: false,
-      sourceMaps: true,
-      sourceFileName: path
-    })
+    transform: ({ code, path }) => {
+      const result = require('@babel/core').transformSync(code, {
+        plugins: [require('react-refresh/babel'), ...babelPlugins],
+        ast: false,
+        sourceMaps: true,
+        sourceFileName: path
+      })
 
-    if (!/\$RefreshReg\$\(/.test(result.code)) {
-      // no component detected in the file
-      return code
-    }
+      if (!/\$RefreshReg\$\(/.test(result.code)) {
+        // no component detected in the file
+        return code
+      }
 
-    const header = `
+      const header = `
   import RefreshRuntime from "${runtimePublicPath}";
 
   let prevRefreshReg;
@@ -51,7 +55,7 @@ export const reactRefreshTransform: Transform = {
     window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
   }`.replace(/[\n]+/gm, '')
 
-    const footer = `
+      const footer = `
   if (import.meta.hot) {
     window.$RefreshReg$ = prevRefreshReg;
     window.$RefreshSig$ = prevRefreshSig;
@@ -60,9 +64,10 @@ export const reactRefreshTransform: Transform = {
     RefreshRuntime.performReactRefresh();
   }`
 
-    return {
-      code: `${header}${result.code}${footer}`,
-      map: result.map
+      return {
+        code: `${header}${result.code}${footer}`,
+        map: result.map
+      }
     }
   }
 }
