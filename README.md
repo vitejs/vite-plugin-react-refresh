@@ -8,8 +8,10 @@ This plugin is included by default in the [create-vite-app](https://github.com/v
 
 ``` js
 // vite.config.js
-module.exports = {
+import reactPlugin from 'vite-plugin-react'
+
+export default {
   jsx: 'react',
-  plugins: [require('vite-plugin-react')]
+  plugins: [reactPlugin]
 }
 ```
