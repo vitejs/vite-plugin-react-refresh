@@ -1,5 +1,11 @@
 import { runtimePublicPath } from './serverPlugin'
 import { Transform } from 'vite'
+import {
+  File,
+  Identifier,
+  isIdentifier,
+  isVariableDeclaration
+} from '@babel/types'
 
 export const reactRefreshTransform: Transform = {
   test: ({ path, isBuild }) => {
@@ -10,7 +16,7 @@ export const reactRefreshTransform: Transform = {
       // do not transform for production builds
       return false
     }
-    if ((path.startsWith(`/@modules/`) || path.includes('node_modules')) && !path.endsWith('x')) {
+    if (isDependency(path) && !path.endsWith('x')) {
       // do not transform if this is a dep and is not jsx/tsx
       return false
     }
@@ -20,7 +26,7 @@ export const reactRefreshTransform: Transform = {
   transform: ({ code, path }) => {
     const result = require('@babel/core').transformSync(code, {
       plugins: [require('react-refresh/babel')],
-      ast: false,
+      ast: true,
       sourceMaps: true,
       sourceFileName: path
     })
@@ -56,8 +62,13 @@ export const reactRefreshTransform: Transform = {
     window.$RefreshReg$ = prevRefreshReg;
     window.$RefreshSig$ = prevRefreshSig;
 
-    import.meta.hot.accept();
-    RefreshRuntime.performReactRefresh();
+    ${isRefreshBoundary(result.ast) ? `import.meta.hot.accept();` : ``}
+    if (!window.__vite_plugin_react_timeout) {
+      window.__vite_plugin_react_timeout = setTimeout(() => {
+        window.__vite_plugin_react_timeout = 0;
+        RefreshRuntime.performReactRefresh();
+      }, 30);
+    }
   }`
 
     return {
@@ -65,4 +76,30 @@ export const reactRefreshTransform: Transform = {
       map: result.map
     }
   }
+}
+
+function isDependency(path: string) {
+  return path.startsWith(`/@modules/`) || path.includes('node_modules')
+}
+
+function isRefreshBoundary(ast: File) {
+  // Every export must be a React component.
+  return ast.program.body.every((node) => {
+    if (node.type !== 'ExportNamedDeclaration') {
+      return true
+    }
+    const { declaration, specifiers } = node
+    if (isVariableDeclaration(declaration)) {
+      return declaration.declarations.every(({ id }) => {
+        return isIdentifier(id) && isComponentishName(id.name)
+      })
+    }
+    return specifiers.every((spec) => {
+      return isComponentishName(spec.exported.name)
+    })
+  })
+}
+
+function isComponentishName(name: Identifier) {
+  return typeof name === 'string' && name[0] >= 'A' && name[0] <= 'Z'
 }
