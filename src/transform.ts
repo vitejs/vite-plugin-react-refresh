@@ -2,7 +2,6 @@ import { runtimePublicPath } from './serverPlugin'
 import { Transform } from 'vite'
 import {
   File,
-  Identifier,
   isIdentifier,
   isVariableDeclaration
 } from '@babel/types'
@@ -93,16 +92,17 @@ function isRefreshBoundary(ast: File) {
     }
     const { declaration, specifiers } = node
     if (isVariableDeclaration(declaration)) {
-      return declaration.declarations.every(({ id }) => {
-        return isIdentifier(id) && isComponentishName(id.name)
-      })
+      return declaration.declarations.every(
+        ({ id }) => isIdentifier(id) && isComponentishName(id.name)
+      )
     }
-    return specifiers.every((spec) => {
-      return isComponentishName(spec.exported.name)
-    })
+    return specifiers.every(
+      ({ exported }) =>
+        isIdentifier(exported) && isComponentishName(exported.name)
+    )
   })
 }
 
-function isComponentishName(name: Identifier) {
+function isComponentishName(name: string) {
   return typeof name === 'string' && name[0] >= 'A' && name[0] <= 'Z'
 }
