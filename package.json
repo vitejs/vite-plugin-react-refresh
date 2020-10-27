@@ -28,6 +28,7 @@
   "homepage": "https://github.com/vitejs/vite-plugin-react/tree/master/#readme",
   "dependencies": {
     "@babel/core": "^7.9.6",
+    "@babel/plugin-syntax-import-meta": "^7.10.4",
     "@babel/types": "^7.9.6",
     "react-refresh": "^0.8.2"
   },

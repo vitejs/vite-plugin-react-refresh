@@ -25,7 +25,10 @@ export const reactRefreshTransform: Transform = {
 
   transform: ({ code, path }) => {
     const result = require('@babel/core').transformSync(code, {
-      plugins: [require('react-refresh/babel')],
+      plugins: [
+        require('@babel/plugin-syntax-import-meta'),
+        require('react-refresh/babel')
+      ],
       ast: true,
       sourceMaps: true,
       sourceFileName: path
