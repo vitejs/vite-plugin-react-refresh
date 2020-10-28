@@ -1,5 +1,5 @@
 {
-  "name": "vite-plugin-react",
+  "name": "@alloc/vite-plugin-react",
   "version": "3.0.2",
   "description": "React fast refresh plugin for Vite",
   "main": "dist/index.js",
