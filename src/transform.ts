@@ -1,10 +1,6 @@
+import type { File as BabelAST } from '@babel/types'
 import { runtimePublicPath } from './serverPlugin'
 import { Transform } from 'vite'
-import {
-  File,
-  isIdentifier,
-  isVariableDeclaration
-} from '@babel/types'
 
 export const reactRefreshTransform: Transform = {
   test: ({ path, isBuild }) => {
@@ -84,21 +80,21 @@ function isDependency(path: string) {
   return path.startsWith(`/@modules/`) || path.includes('node_modules')
 }
 
-function isRefreshBoundary(ast: File) {
+function isRefreshBoundary(ast: BabelAST) {
   // Every export must be a React component.
   return ast.program.body.every((node) => {
     if (node.type !== 'ExportNamedDeclaration') {
       return true
     }
     const { declaration, specifiers } = node
-    if (isVariableDeclaration(declaration)) {
+    if (declaration && declaration.type === 'VariableDeclaration') {
       return declaration.declarations.every(
-        ({ id }) => isIdentifier(id) && isComponentishName(id.name)
+        ({ id }) => id.type === 'Identifier' && isComponentishName(id.name)
       )
     }
     return specifiers.every(
       ({ exported }) =>
-        isIdentifier(exported) && isComponentishName(exported.name)
+        exported.type === 'Identifier' && isComponentishName(exported.name)
     )
   })
 }
