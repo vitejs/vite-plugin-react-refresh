@@ -1,3 +1,4 @@
+import type { File as BabelAST } from '@babel/types'
 import { runtimePublicPath } from './serverPlugin'
 import { Transform } from 'vite'
 
@@ -10,7 +11,7 @@ export const reactRefreshTransform: Transform = {
       // do not transform for production builds
       return false
     }
-    if ((path.startsWith(`/@modules/`) || path.includes('node_modules')) && !path.endsWith('x')) {
+    if (isDependency(path) && !path.endsWith('x')) {
       // do not transform if this is a dep and is not jsx/tsx
       return false
     }
@@ -23,7 +24,7 @@ export const reactRefreshTransform: Transform = {
         require('@babel/plugin-syntax-import-meta'),
         require('react-refresh/babel')
       ],
-      ast: false,
+      ast: true,
       sourceMaps: true,
       sourceFileName: path
     })
@@ -59,8 +60,13 @@ export const reactRefreshTransform: Transform = {
     window.$RefreshReg$ = prevRefreshReg;
     window.$RefreshSig$ = prevRefreshSig;
 
-    import.meta.hot.accept();
-    RefreshRuntime.performReactRefresh();
+    ${isRefreshBoundary(result.ast) ? `import.meta.hot.accept();` : ``}
+    if (!window.__vite_plugin_react_timeout) {
+      window.__vite_plugin_react_timeout = setTimeout(() => {
+        window.__vite_plugin_react_timeout = 0;
+        RefreshRuntime.performReactRefresh();
+      }, 30);
+    }
   }`
 
     return {
@@ -68,4 +74,31 @@ export const reactRefreshTransform: Transform = {
       map: result.map
     }
   }
+}
+
+function isDependency(path: string) {
+  return path.startsWith(`/@modules/`) || path.includes('node_modules')
+}
+
+function isRefreshBoundary(ast: BabelAST) {
+  // Every export must be a React component.
+  return ast.program.body.every((node) => {
+    if (node.type !== 'ExportNamedDeclaration') {
+      return true
+    }
+    const { declaration, specifiers } = node
+    if (declaration && declaration.type === 'VariableDeclaration') {
+      return declaration.declarations.every(
+        ({ id }) => id.type === 'Identifier' && isComponentishName(id.name)
+      )
+    }
+    return specifiers.every(
+      ({ exported }) =>
+        exported.type === 'Identifier' && isComponentishName(exported.name)
+    )
+  })
+}
+
+function isComponentishName(name: string) {
+  return typeof name === 'string' && name[0] >= 'A' && name[0] <= 'Z'
 }
